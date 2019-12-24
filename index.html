@@ -1,9 +1,25 @@
 <header>
+        <!-- Globally shared libraries -->
+        <script src="tinkamo-lib/jquery.min.js"></script>
+        <script src="tinkamo-lib/genericlib.js"></script>
+        <script src="tinkamo-lib/bluetooth.js"></script>
+        <script src="tinkamo-lib/event-dispatcher.js"></script>
+    
+        <!-- Bass class of all Tinkamo Module classes -->
+        <script src="tinkamo-lib/t-module/t-module.js"></script>
+        <script src="tinkamo-lib/t-module/t-core-module.js"></script>
+    
+        <!-- Individual classes for modules. Use on demand. -->
+        <script src="tinkamo-lib/t-module/t-module-motor.js"></script>
+        <script src="tinkamo-lib/t-module/t-func-module-button.js"></script>
+    
     <style>
         body{
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color:white;
             text-align: center;
+            padding: 0;
+            margin: 0;
         }
         .card {
             width:25%;
@@ -46,6 +62,7 @@
             position: absolute;
             border:solid 1vh white;
             bottom:12%;
+            display: flex;
         }
         .votehere{
             width:100%;
@@ -121,58 +138,67 @@
             background-size:6vh;
         }
         .graph-hearts{
-            left:0%;
+            width:25%;
+            height:100%;
             background-color: yellow;
         }
         .graph-tiles{
-            left:25%;
+            width:25%;
+            height:100%;
             background-color: blue;
         }
         .graph-clovers{
-            left:50%;
+            width:25%;
+            height:100%;
             background-color: red;
         }
         .graph-pikes{
-            left:75%;
+            width:25%;
+            height:100%;
             background-color: green;
         }
     </style>
     <script>
-        
+        window.onload = function () {
+            $(".card").click(onClickPortrait)
+            function onClickPortrait () {
+                console.log("You have voted for "+$(this).attr("party"))
+            }
+        }
     </script>
 </header>
 <body>
     <div class="TheJokerMachine">
         The Joker Machine
     </div>
-    <div class="card card-hearts">
+    <div class="card card-hearts" party="0">
         <div class="party">Monarchy</div> 
         <div class="name">Queen Elizabth I</div> 
         <div class="portrait portrait-hearts"> 
         </div> 
         <div class="icon icon-hearts"></div> 
     </div>
-    <div class="card card-tiles">
+    <div class="card card-tiles" party="1">
         <div class="party">Democracy</div> 
         <div class="name">Franklin D Roosevelt</div> 
         <div class="portrait portrait-tiles">
         </div> 
         <div class="icon icon-tiles"></div> 
     </div>
-    <div class="card card-clovers">
+    <div class="card card-clovers" party="2">
         <div class="party">Communism</div> 
         <div class="name">Joseph Stalin</div> 
         <div class="portrait portrait-clovers"></div> 
         <div class="icon icon-clovers"></div> 
     </div>
-    <div class="card card-pikes">
+    <div class="card card-pikes" party="3">
         <div class="party">Republic</div> 
         <div class="name">Andrew Jackson</div> 
         <div class="portrait portrait-pikes"></div> 
         <div class="icon icon-pikes"></div> 
     </div>
     <div class="votegraph">
-        <div class="graph-heart"></div>
+        <div class="graph-hearts"></div>
         <div class="graph-tiles"></div>
         <div class="graph-clovers"></div>
         <div class="graph-pikes"></div>
