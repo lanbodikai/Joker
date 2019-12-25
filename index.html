@@ -68,101 +68,147 @@
             width:100%;
             height:10%;
             background-color: black;
-            font-size: 5vh;
+            font-size: 7vh;
             position: absolute;
             bottom:0;
             border:solid 1vh white;
         }
-        .card-hearts{
+        .card-monarchy{
             left:0%;
-            background-color: yellow;
+            background-color: orange;
         }
-        .card-tiles{
+        .card-democracy{
             left:25%;
             background-color: blue;
         }
-        .card-clovers{
+        .card-communism{
             left:50%;
             background-color: red;
         }
-        .card-pikes{
+        .card-republic{
             left:75%;
             background-color: green;
         }
-        .portrait-hearts{
-            background-image: url(file:///Users/lanbodikai/Documents/portrait-hearts.png);
+        .portrait-monarchy{
+            background-image: url(images/monarchy.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:contain;
         }
-        .portrait-tiles{
-            background-image: url(file:///Users/lanbodikai/Documents/portrait-tiles.png);
+        .portrait-democracy{
+            background-image: url(images/democracy.png);
             background-position:center;
             background-repeat: no-repeat;
             background-size: contain;
         }
-        .portrait-clovers{
-            background-image: url(file:///Users/lanbodikai/Documents/portrait-clovers.png);
+        .portrait-communism{
+            background-image: url(images/communism.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:contain;
         }
-        .portrait-pikes{
-            background-image: url(file:///Users/lanbodikai/Documents/portrait-pikes.png);
+        .portrait-republic{
+            background-image: url(images/republic.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:contain;
         }
-        .icon-hearts{
-            background-image: url(file:///Users/lanbodikai/Documents/Joker/icon-hearts.png);
+        .icon-monarchy{
+            background-image: url(images/icon-hearts.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:6vh;
         }
-        .icon-tiles{
-            background-image: url(file:///Users/lanbodikai/Documents/Joker/icon-tiles.png);
+        .icon-democracy{
+            background-image: url(images/icon-tiles.png);
             background-position:center;
             background-repeat: no-repeat;
             background-size: 6vh;
         }
-        .icon-clovers{
-            background-image: url(file:///Users/lanbodikai/Documents/Joker/icon-clovers.png);
+        .icon-communism{
+            background-image: url(images/icon-clovers.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:6vh;
         }
-        .icon-pikes{
-            background-image: url(file:///Users/lanbodikai/Documents/Joker/icon-pikes.png);
+        .icon-republic{
+            background-image: url(images/icon-pikes.png);
             background-position:center;
             background-repeat:no-repeat;
             background-size:6vh;
         }
-        .graph-hearts{
+        .graph-monarchy{
             width:25%;
             height:100%;
-            background-color: yellow;
+            background-color: orange;
+            font-size: 4vh;
+            line-height: 10vh;
         }
-        .graph-tiles{
+        .graph-democracy{
             width:25%;
             height:100%;
             background-color: blue;
+            font-size: 4vh;
+            line-height: 10vh;
         }
-        .graph-clovers{
+        .graph-communism{
             width:25%;
             height:100%;
             background-color: red;
+            font-size: 4vh;
+            line-height: 10vh;
         }
-        .graph-pikes{
+        .graph-republic{
             width:25%;
             height:100%;
             background-color: green;
+            font-size: 4vh;
+            line-height: 10vh;
         }
     </style>
     <script>
+        // window.onload is the initialization function triggered when the whole html body is loaded
         window.onload = function () {
-            $(".card").click(onClickPortrait)
+            $(".portrait").click(onClickPortrait)
+            window.votes = {
+                communism:0,
+                monarchy:0,
+                democracy:0,
+                republic:0
+            }
+            function vote(party){
+                votes[party]++
+                console.log(votes)
+                let totalVotes = votes.communism + votes.monarchy + votes.democracy + votes.republic
+                $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
+                $(".graph-democracy").html(votes.democracy).css("width", votes.democracy/totalVotes *100 + "%")
+                $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
+                $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
+            }
+            window.audioElement = new Audio();
+            audioElement.addEventListener("ended", function(){
+                console.log("ended");
+                shutUp()
+            });
             function onClickPortrait () {
-                console.log("You have voted for "+$(this).attr("party"))
+                let portrait = $(this)
+                let party = portrait.attr("party")
+                console.log("You have voted for "+ party, this)
+                shutUp()
+                speak(party)
+                vote(party)
+            }
+            function speak(party) {
+                let portrait = $(".portrait-" + party)
+                window.currentParty = party
+                portrait.css("background-image","url(images/"+ party + ".gif)")
+                audioElement.src="sounds/"+ party +".mp3"
+                audioElement.play();
+            }
+            function shutUp() {
+                if (!window.currentParty) return
+                let portrait = $(".portrait-" + currentParty)
+                portrait.css("background-image","url(images/"+ currentParty + ".png)")
             }
         }
     </script>
@@ -171,40 +217,40 @@
     <div class="TheJokerMachine">
         The Joker Machine
     </div>
-    <div class="card card-hearts" party="0">
+    <div class="card card-monarchy" >
         <div class="party">Monarchy</div> 
         <div class="name">Queen Elizabth I</div> 
-        <div class="portrait portrait-hearts"> 
+        <div class="portrait portrait-monarchy" party="monarchy"> 
         </div> 
-        <div class="icon icon-hearts"></div> 
+        <div class="icon icon-monarchy"></div> 
     </div>
-    <div class="card card-tiles" party="1">
+    <div class="card card-democracy" >
         <div class="party">Democracy</div> 
         <div class="name">Franklin D Roosevelt</div> 
-        <div class="portrait portrait-tiles">
+        <div class="portrait portrait-democracy"party="democracy">
         </div> 
-        <div class="icon icon-tiles"></div> 
+        <div class="icon icon-democracy"></div> 
     </div>
-    <div class="card card-clovers" party="2">
+    <div class="card card-communism" >
         <div class="party">Communism</div> 
         <div class="name">Joseph Stalin</div> 
-        <div class="portrait portrait-clovers"></div> 
-        <div class="icon icon-clovers"></div> 
+        <div class="portrait portrait-communism" party="communism"></div> 
+        <div class="icon icon-communism"></div> 
     </div>
-    <div class="card card-pikes" party="3">
+    <div class="card card-republic" >
         <div class="party">Republic</div> 
         <div class="name">Andrew Jackson</div> 
-        <div class="portrait portrait-pikes"></div> 
-        <div class="icon icon-pikes"></div> 
+        <div class="portrait portrait-republic"party="republic"></div> 
+        <div class="icon icon-republic"></div> 
     </div>
     <div class="votegraph">
-        <div class="graph-hearts"></div>
-        <div class="graph-tiles"></div>
-        <div class="graph-clovers"></div>
-        <div class="graph-pikes"></div>
+        <div class="graph-monarchy">0</div>
+        <div class="graph-democracy">0</div>
+        <div class="graph-communism">0</div>
+        <div class="graph-republic">0</div>
     </div>
     <div class="votehere">
-        Vote Here!!
+        Vote Here!
     </div>
     <div>
 </body>
