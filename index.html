@@ -10,8 +10,7 @@
         <script src="tinkamo-lib/t-module/t-core-module.js"></script>
     
         <!-- Individual classes for modules. Use on demand. -->
-        <script src="tinkamo-lib/t-module/t-module-motor.js"></script>
-        <script src="tinkamo-lib/t-module/t-func-module-button.js"></script>
+        <script src="tinkamo-lib/t-module/t-func-module-color.js"></script>
     
     <style>
         body{
@@ -79,7 +78,7 @@
         }
         .card-democracy{
             left:25%;
-            background-color: blue;
+            background-color: rgb(70,41,128);
         }
         .card-communism{
             left:50%;
@@ -147,7 +146,7 @@
         .graph-democracy{
             width:25%;
             height:100%;
-            background-color: blue;
+            background-color: rgb(70,41,128);
             font-size: 4vh;
             line-height: 10vh;
         }
@@ -167,23 +166,70 @@
         }
     </style>
     <script>
+        window.TOLERENCE = 50
+        const COLORS = {
+            monarchy: {
+                r:215,
+                g:153,
+                b:74
+            }
+            ,democracy: {
+                r:0,
+                g:41,
+                b:128
+            }
+            ,communism: {
+                r:215,
+                g:23,
+                b:29
+            }
+            ,republic: {
+                r:64,
+                g:228,
+                b:108
+            }
+        }
+
         // window.onload is the initialization function triggered when the whole html body is loaded
         window.onload = function () {
+
+            new Bluetooth() // Bluetooth must initialize for once
+            color = new TFunctionModuleColor()
+            color.onColorChange = function (c) {
+                console.log(c) 
+                if (c) {
+                    checkColor(c,"monarchy")
+                    checkColor(c,"democracy")
+                    checkColor(c,"republic")
+                    checkColor(c,"communism")
+                }
+                else {
+                    delete window.currentVote
+                }
+
+            }
+
+            // party: string - The name of the party, e.g. "monarchy", "democracy", etc.
+            function checkColor (c, party) {
+                let dr = Math.abs(c.r - COLORS[party].r)
+                let dg = Math.abs(c.g - COLORS[party].g)
+                let db = Math.abs(c.b - COLORS[party].b)
+                let dTotal = dr + dg + db
+                if(dTotal < TOLERENCE) {
+                    if (window.currentVote != party) vote(party)
+                    window.currentVote = party
+                } 
+            }
+            $(".votehere").click(connectSensor)
+            async function connectSensor () {
+                await color.connectToModule(true)
+            }
             $(".portrait").click(onClickPortrait)
             window.votes = {
                 communism:0,
                 monarchy:0,
                 democracy:0,
                 republic:0
-            }
-            function vote(party){
-                votes[party]++
-                console.log(votes)
-                let totalVotes = votes.communism + votes.monarchy + votes.democracy + votes.republic
-                $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
-                $(".graph-democracy").html(votes.democracy).css("width", votes.democracy/totalVotes *100 + "%")
-                $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
-                $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
             }
             window.audioElement = new Audio();
             audioElement.addEventListener("ended", function(){
@@ -198,19 +244,29 @@
                 speak(party)
                 vote(party)
             }
-            function speak(party) {
-                let portrait = $(".portrait-" + party)
-                window.currentParty = party
-                portrait.css("background-image","url(images/"+ party + ".gif)")
-                audioElement.src="sounds/"+ party +".mp3"
-                audioElement.play();
-            }
-            function shutUp() {
-                if (!window.currentParty) return
-                let portrait = $(".portrait-" + currentParty)
-                portrait.css("background-image","url(images/"+ currentParty + ".png)")
-            }
         }
+        function vote(party){
+            votes[party]++
+            console.log(votes)
+            let totalVotes = votes.communism + votes.monarchy + votes.democracy + votes.republic
+            $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
+            $(".graph-democracy").html(votes.democracy).css("width", votes.democracy/totalVotes *100 + "%")
+            $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
+            $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
+        }
+        function speak(party) {
+            let portrait = $(".portrait-" + party)
+            window.currentParty = party
+            portrait.css("background-image","url(images/"+ party + ".gif)")
+            audioElement.src="sounds/"+ party +".mp3"
+            audioElement.play();
+        }
+        function shutUp() {
+            if (!window.currentParty) return
+            let portrait = $(".portrait-" + currentParty)
+            portrait.css("background-image","url(images/"+ currentParty + ".png)")
+        }
+
     </script>
 </header>
 <body>
