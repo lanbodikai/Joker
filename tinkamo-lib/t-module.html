@@ -14,6 +14,7 @@
     <!-- Individual classes for modules. Use on demand. -->
     <script src="t-module/t-module-motor.js"></script>
     <script src="t-module/t-func-module-button.js"></script>
+    <script src="t-module/t-func-module-color.js"></script>
 
     <style>
         * {
@@ -42,6 +43,14 @@
             button = new TFunctionModuleButton()
             button.onButtonChange = function (v) {
                 $('#titleButton>span').html(v? 'Pressed': 'Released')
+            }
+
+            color = new TFunctionModuleColor()
+            color.onColorChange = function (c) {
+                if (c) {
+                    console.log(c)
+                    $('#titleColor>span').html(`R${c.r} G${c.g} B${c.b}`)
+                }
             }
 
             motor = new TModuleMotor()
@@ -73,6 +82,8 @@
 <body>
     <h1 id="titleButton">Button <span></span></h1>
     <div class="button buttonConnection" module="button">Connect</div>
+    <h1 id="titleColor">Color Sensor <span></span></h1>
+    <div class="button buttonConnection" module="color">Connect</div>
     <h1>Motor</h1>
     <div class="button buttonConnection" module="motor">Connect</div>
     <div id="buttonMotor-10" class="button">-10</div>
