@@ -1,0 +1,313 @@
+<header>
+        <!-- Globally shared libraries -->
+        <script src="tinkamo-lib/jquery.min.js"></script>
+        <script src="tinkamo-lib/genericlib.js"></script>
+        <script src="tinkamo-lib/bluetooth.js"></script>
+        <script src="tinkamo-lib/event-dispatcher.js"></script>
+    
+        <!-- Bass class of all Tinkamo Module classes -->
+        <script src="tinkamo-lib/t-module/t-module.js"></script>
+        <script src="tinkamo-lib/t-module/t-core-module.js"></script>
+    
+        <!-- Individual classes for modules. Use on demand. -->
+        <script src="tinkamo-lib/t-module/t-func-module-color.js"></script>
+    
+    <style>
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color:white;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+        }
+        .card {
+            width:25%;
+            height:60%;
+            position: absolute;
+            top:15vh;
+            border:solid 1vh white;
+        }
+        .TheJokerMachine{
+            width:100%;
+            height:20%;
+            background-color: black;
+            font-size: 10vh;
+            text-align: center;
+            position: absolute;
+            border:solid 1vh white;
+        }
+        .party{
+            width:100%;
+            height:15%;
+            font-size: 7vh;
+        }
+
+        .name{
+            width:100%;
+            height:15%;
+            font-size: 4vh;
+        }
+        .portrait{
+            width:100%;
+            height:50%;
+        }
+        .icon{
+            width:100%;
+            height:20%;
+        }
+        .votegraph{
+            width:100%;
+            height:10%;
+            position: absolute;
+            border:solid 1vh white;
+            bottom:12%;
+            display: flex;
+        }
+        .votehere{
+            width:100%;
+            height:10%;
+            background-color: black;
+            font-size: 7vh;
+            position: absolute;
+            bottom:0;
+            border:solid 1vh white;
+        }
+        .card-monarchy{
+            left:0%;
+            background-color: rgb(70,41,128);
+        }
+        .card-fascism{
+            left:25%;
+            background-color: orange
+        ;
+        }
+        .card-communism{
+            left:50%;
+            background-color: red;
+        }
+        .card-republic{
+            left:75%;
+            background-color: green;
+        }
+        .portrait-monarchy{
+            background-image: url(images/monarchy.png);
+            background-position:left;
+            background-repeat:no-repeat;
+            background-size:cover;
+        }
+        .portrait-fascism{
+            background-image: url(images/communism.png);
+            background-position:left;
+            background-repeat: no-repeat;
+            background-size:cover;
+        }
+        .portrait-communism{
+            background-image: url(images/fascism.png);
+            background-position:left;
+            background-repeat:no-repeat;
+            background-size:cover;
+        }
+        .portrait-republic{
+            background-image: url(images/republic.png);
+            background-position:left;
+            background-repeat:no-repeat;
+            background-size:cover;
+        }
+        .icon-monarchy{
+            background-image: url(images/icon-hearts.png);
+            background-position:center;
+            background-repeat:no-repeat;
+            background-size:6vh;
+        }
+        .icon-fascism{
+            background-image: url(images/icon-tiles.png);
+            background-position:center;
+            background-repeat: no-repeat;
+            background-size: 6vh;
+        }
+        .icon-communism{
+            background-image: url(images/icon-clovers.png);
+            background-position:center;
+            background-repeat:no-repeat;
+            background-size:6vh;
+        }
+        .icon-republic{
+            background-image: url(images/icon-pikes.png);
+            background-position:center;
+            background-repeat:no-repeat;
+            background-size:6vh;
+        }
+        .graph-monarchy{
+            width:25%;
+            height:100%;
+            background-color: rgb(70,41,128);
+            font-size: 4vh;
+            line-height: 10vh;
+        }
+        .graph-fascism{
+            width:25%;
+            height:100%;
+            background-color: orange;
+            font-size: 4vh;
+            line-height: 10vh;
+        }
+        .graph-communism{
+            width:25%;
+            height:100%;
+            background-color: red ;
+            font-size: 4vh;
+            line-height: 10vh;
+        }
+        .graph-republic{
+            width:25%;
+            height:100%;
+            background-color: green;
+            font-size: 4vh;
+            line-height: 10vh;
+        }
+    </style>
+    <script>
+        window.TOLERENCE = 40
+        const COLORS = {
+            monarchy: {
+                r:0,
+                g:41,
+                b:128
+            }
+            ,fascism: {
+                r:215,
+                g:153,
+                b:74
+            }
+            ,communism: {
+                r:215,
+                g:20,
+                b:17
+            }
+            ,republic: {
+                r:64,
+                g:228,
+                b:108
+            }
+        }
+
+        // window.onload is the initialization function triggered when the whole html body is loaded
+        window.onload = function () {
+
+            new Bluetooth() // Bluetooth must initialize for once
+            color = new TFunctionModuleColor()
+            color.onColorChange = function (c) {
+                console.log(c) 
+                if (c) {
+                    checkColor(c,"monarchy")
+                    checkColor(c,"fascism")
+                    checkColor(c,"republic")
+                    checkColor(c,"communism")
+                }
+                else {
+                    delete window.currentVote
+                }
+
+            }
+
+            // party: string - The name of the party, e.g. "monarchy", "democracy", etc.
+            function checkColor (c, party) {
+                let dr = Math.abs(c.r - COLORS[party].r)
+                let dg = Math.abs(c.g - COLORS[party].g)
+                let db = Math.abs(c.b - COLORS[party].b)
+                let dTotal = dr + dg + db
+                if(dTotal < TOLERENCE) {
+                    if (window.currentVote != party) vote(party)
+                    window.currentVote = party
+                } 
+            }
+            $(".votehere").click(connectSensor)
+            async function connectSensor () {
+                await color.connectToModule(true)
+            }
+            $(".portrait").click(onClickPortrait)
+            window.votes = {
+                communism:0,
+                monarchy:0,
+                fascism:0,
+                republic:0
+            }
+            window.audioElement = new Audio();
+            audioElement.addEventListener("ended", function(){
+                console.log("ended");
+                shutUp()
+            });
+            function onClickPortrait () {
+                let portrait = $(this)
+                let party = portrait.attr("party")
+                console.log("You have voted for "+ party, this)
+                shutUp()
+                speak(party)
+                vote(party)
+            }
+        }
+        function vote(party){
+            votes[party]++
+            console.log(votes)
+            let totalVotes = votes.communism + votes.monarchy + votes.fascism + votes.republic
+            $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
+            $(".graph-fascism").html(votes.fascism).css("width", votes.fascism/totalVotes *100 + "%")
+            $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
+            $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
+        }
+        function speak(party) {
+            let portrait = $(".portrait-" + party)
+            window.currentParty = party
+            portrait.css("background-image","url(images/"+ party + ".gif)")
+            audioElement.src="sounds/"+ party +".mp3"
+            audioElement.play();
+        }
+        function shutUp() {
+            if (!window.currentParty) return
+            let portrait = $(".portrait-" + currentParty)
+            portrait.css("background-image","url(images/"+ currentParty + ".png)")
+        }
+
+    </script>
+</header>
+<body>
+    <div class="TheJokerMachine">
+        The Polling Machine
+    </div>
+    <div class="card card-monarchy" >
+        <div class="party">Monarchy</div> 
+        <div class="name">Queen Victoria</div> 
+        <div class="portrait portrait-monarchy" party="monarchy"> 
+        </div> 
+        <div class="icon icon-monarchy"></div> 
+    </div>
+    <div class="card card-fascism" >
+        <div class="party">Communim</div> 
+        <div class="name">Kai</div> 
+        <div class="portrait portrait-fascism"party="fascism">
+        </div> 
+        <div class="icon icon-fascism"></div> 
+    </div>
+    <div class="card card-communism" >
+        <div class="party">Communism</div> 
+        <div class="name">Admiral Erich Raeder</div> 
+        <div class="portrait portrait-communism" party="communism"></div> 
+        <div class="icon icon-communism"></div> 
+    </div>
+    <div class="card card-republic" >
+        <div class="party">Republic</div> 
+        <div class="name">Jomo Kenyatta</div> 
+        <div class="portrait portrait-republic"party="republic"></div> 
+        <div class="icon icon-republic"></div> 
+    </div>
+    <div class="votegraph">
+        <div class="graph-monarchy">0</div>
+        <div class="graph-fascism">0</div>
+        <div class="graph-communism">0</div>
+        <div class="graph-republic">0</div>
+    </div>
+    <div class="votehere">
+        Vote Here!
+    </div>
+    <div>
+</body>
