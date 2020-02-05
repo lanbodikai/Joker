@@ -74,11 +74,12 @@
         }
         .card-monarchy{
             left:0%;
-            background-color: orange;
-        }
-        .card-democracy{
-            left:25%;
             background-color: rgb(70,41,128);
+        }
+        .card-fascism{
+            left:25%;
+            background-color: orange
+        ;
         }
         .card-communism{
             left:50%;
@@ -90,27 +91,27 @@
         }
         .portrait-monarchy{
             background-image: url(images/monarchy.png);
-            background-position:center;
+            background-position:left;
             background-repeat:no-repeat;
-            background-size:contain;
+            background-size:cover;
         }
-        .portrait-democracy{
-            background-image: url(images/democracy.png);
-            background-position:center;
+        .portrait-fascism{
+            background-image: url(images/communism.png);
+            background-position:left;
             background-repeat: no-repeat;
-            background-size: contain;
+            background-size:cover;
         }
         .portrait-communism{
-            background-image: url(images/communism.png);
-            background-position:center;
+            background-image: url(images/fascism.png);
+            background-position:left;
             background-repeat:no-repeat;
-            background-size:contain;
+            background-size:cover;
         }
         .portrait-republic{
             background-image: url(images/republic.png);
-            background-position:center;
+            background-position:left;
             background-repeat:no-repeat;
-            background-size:contain;
+            background-size:cover;
         }
         .icon-monarchy{
             background-image: url(images/icon-hearts.png);
@@ -118,7 +119,7 @@
             background-repeat:no-repeat;
             background-size:6vh;
         }
-        .icon-democracy{
+        .icon-fascism{
             background-image: url(images/icon-tiles.png);
             background-position:center;
             background-repeat: no-repeat;
@@ -139,21 +140,21 @@
         .graph-monarchy{
             width:25%;
             height:100%;
-            background-color: orange;
+            background-color: rgb(70,41,128);
             font-size: 4vh;
             line-height: 10vh;
         }
-        .graph-democracy{
+        .graph-fascism{
             width:25%;
             height:100%;
-            background-color: rgb(70,41,128);
+            background-color: orange;
             font-size: 4vh;
             line-height: 10vh;
         }
         .graph-communism{
             width:25%;
             height:100%;
-            background-color: red;
+            background-color: red ;
             font-size: 4vh;
             line-height: 10vh;
         }
@@ -166,22 +167,22 @@
         }
     </style>
     <script>
-        window.TOLERENCE = 50
+        window.TOLERENCE = 40
         const COLORS = {
             monarchy: {
-                r:215,
-                g:153,
-                b:74
-            }
-            ,democracy: {
                 r:0,
                 g:41,
                 b:128
             }
+            ,fascism: {
+                r:215,
+                g:153,
+                b:74
+            }
             ,communism: {
                 r:215,
-                g:23,
-                b:29
+                g:20,
+                b:17
             }
             ,republic: {
                 r:64,
@@ -199,7 +200,7 @@
                 console.log(c) 
                 if (c) {
                     checkColor(c,"monarchy")
-                    checkColor(c,"democracy")
+                    checkColor(c,"fascism")
                     checkColor(c,"republic")
                     checkColor(c,"communism")
                 }
@@ -228,7 +229,7 @@
             window.votes = {
                 communism:0,
                 monarchy:0,
-                democracy:0,
+                fascism:0,
                 republic:0
             }
             window.audioElement = new Audio();
@@ -248,9 +249,9 @@
         function vote(party){
             votes[party]++
             console.log(votes)
-            let totalVotes = votes.communism + votes.monarchy + votes.democracy + votes.republic
+            let totalVotes = votes.communism + votes.monarchy + votes.fascism + votes.republic
             $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
-            $(".graph-democracy").html(votes.democracy).css("width", votes.democracy/totalVotes *100 + "%")
+            $(".graph-fascism").html(votes.fascism).css("width", votes.fascism/totalVotes *100 + "%")
             $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
             $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
         }
@@ -271,37 +272,37 @@
 </header>
 <body>
     <div class="TheJokerMachine">
-        The Joker Machine
+        The Polling Machine
     </div>
     <div class="card card-monarchy" >
         <div class="party">Monarchy</div> 
-        <div class="name">Queen Elizabth I</div> 
+        <div class="name">Queen Victoria</div> 
         <div class="portrait portrait-monarchy" party="monarchy"> 
         </div> 
         <div class="icon icon-monarchy"></div> 
     </div>
-    <div class="card card-democracy" >
-        <div class="party">Democracy</div> 
-        <div class="name">Franklin D Roosevelt</div> 
-        <div class="portrait portrait-democracy"party="democracy">
+    <div class="card card-fascism" >
+        <div class="party">Communim</div> 
+        <div class="name">Kai</div> 
+        <div class="portrait portrait-fascism"party="fascism">
         </div> 
-        <div class="icon icon-democracy"></div> 
+        <div class="icon icon-fascism"></div> 
     </div>
     <div class="card card-communism" >
         <div class="party">Communism</div> 
-        <div class="name">Joseph Stalin</div> 
+        <div class="name">Admiral Erich Raeder</div> 
         <div class="portrait portrait-communism" party="communism"></div> 
         <div class="icon icon-communism"></div> 
     </div>
     <div class="card card-republic" >
         <div class="party">Republic</div> 
-        <div class="name">Andrew Jackson</div> 
+        <div class="name">Jomo Kenyatta</div> 
         <div class="portrait portrait-republic"party="republic"></div> 
         <div class="icon icon-republic"></div> 
     </div>
     <div class="votegraph">
         <div class="graph-monarchy">0</div>
-        <div class="graph-democracy">0</div>
+        <div class="graph-fascism">0</div>
         <div class="graph-communism">0</div>
         <div class="graph-republic">0</div>
     </div>
