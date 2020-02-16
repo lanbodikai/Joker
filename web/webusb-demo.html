@@ -30,38 +30,43 @@
     <div class="button-vote" party="1">Vote Communism</div>
 </body>
 <script>
-    window.device = null
-    // Bind connect button
-    $('.button-connect').click(function(){
-        navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
-        .then(selectedDevice => {
-            window.device = selectedDevice;
-            return device.open(); // Begin a session.
+    // Initialization codes to be integrated into your own page.
+    window.onload = function () {
+        window.device = null
+        // Bind connect button
+        // Replace $('.button-connect') with a secret <div> on your page
+        $('.button-connect').click(function(){
+            navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
+            .then(selectedDevice => {
+                window.device = selectedDevice;
+                return device.open(); // Begin a session.
+            })
+            .then(() => {
+                console.log(device.productName);      // "Arduino Micro"
+                console.log(device.manufacturerName); // "Arduino LLC"
+            })
+            .then(() => device.selectConfiguration(1)) // Select configuration .1 for the device.
+            .then(() => device.claimInterface(2)) // Request exclusive control over interface #2.
+            .then(() => device.controlTransferOut({
+                requestType: 'class',
+                recipient: 'interface',
+                request: 0x22,
+                value: 0x01,
+                index: 0x02})) // Ready to receive data
         })
-        .then(() => {
-            console.log(device.productName);      // "Arduino Micro"
-            console.log(device.manufacturerName); // "Arduino LLC"
+        // Bind vote buttons
+        // Move the 3 lines into the function where are vote is casted via the color sensor
+        $('.button-vote').click(function(){
+            if (window.device) {
+                device.transferOut(4, new Uint8Array([parseInt($(this).attr('party'))]))
+            }
         })
-        .then(() => device.selectConfiguration(1)) // Select configuration .1 for the device.
-        .then(() => device.claimInterface(2)) // Request exclusive control over interface #2.
-        .then(() => device.controlTransferOut({
-            requestType: 'class',
-            recipient: 'interface',
-            request: 0x22,
-            value: 0x01,
-            index: 0x02})) // Ready to receive data
-        // .then(() => device.transferIn(5, 64)) // Waiting for 64 bytes of data from endpoint #5.
-        // .then(result => {
-        // let decoder = new TextDecoder();
-        // console.log('Received:', decoder.decode(result.data));
-        // })
-    })
-    // Bind vote buttons
-    $('.button-vote').click(function(){
-        if (window.device) {
-            device.transferOut(4, new Uint8Array([parseInt($(this).attr('party'))]))
-        }
-    })
+
+        // Call this function to show Arduino feedback in the console for debugging
+        monitorUSBInput()
+    }
+
+    // Keep it for debugging
     // Monitor incoming USB port data from Arduino
     async function monitorUSBInput () {
         while (true) {
@@ -81,5 +86,4 @@
             }, seconds * 1000)
         })
     }
-    monitorUSBInput()
 </script>

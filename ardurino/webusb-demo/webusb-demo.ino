@@ -17,23 +17,23 @@ void setup() {
 void loop() {
   int command;
   if (Serial && Serial.available()) {
-    command = Serial.read();
+    command = Serial.read(); // Read the command from the Chrome web page
     // Serial.print() will send feed back data to Chrome via WebUSB for debugging
     Serial.print("Command ");
     Serial.print(command);
     Serial.print(" -> ");
     switch (command) {
-      case 0:
+      case 0: // The command code you defined
         // Write you codes to light uo teh LED strip
         Serial.println("Democracy");
         Serial.flush();
         break;
-      case 1:
+      case 1: // The command code you defined
         // Write you codes to light uo teh LED strip
         Serial.println("Communism");
         Serial.flush();
         break;
-      default:
+      default: // Unknown command. Just for debugging
         Serial.println("Unknown...");
         Serial.flush();
     }
