@@ -2,11 +2,14 @@
     <title>WebUSB + Arduino Demo</title>
 </head>
 <style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 30px;
+    }
     div {
         width: 200px;
         padding: 20px;
         margin: 10px;
-        font-family: Arial, Helvetica, sans-serif;
         text-align: center;
         background-color: #eee;
         cursor: pointer;
@@ -15,8 +18,13 @@
         background-color: #ddd;
     }
 </style>
-<script src="lib/jquery.min.js"></script>
+<script src="tinkamo-lib/jquery.min.js"></script>
 <body>
+    <p>This demo works with Arduino with USB 2,1 support, e.g. Arduino Micro and Arduino Leonardo.</p>
+    <p>To allow WebUSB features, this demo must be hosted 
+        <li>on a secured remote server, e.g. https://yoursecuredserver.com/webusb-demo.html</li>
+        <li>or on your local server, e.g. http://localhost:8888/usb.html</li>
+    </p>
     <div class="button-connect">Connect to USB devices</div>
     <div class="button-vote" party="0">Vote Democracy</div>
     <div class="button-vote" party="1">Vote Communism</div>
