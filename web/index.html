@@ -192,61 +192,42 @@
         }
 
         // window.onload is the initialization function triggered when the whole html body is loaded
-        window.onload = function () {
-            window.device = null
-        // Bind connect button
-        // Replace $('.button-connect') with a secret <div> on your page
-        $('.button-connect').click(function(){
-            navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
-            .then(selectedDevice => {
-                window.device = selectedDevice;
-                return device.open(); // Begin a session.
-            })
-            .then(() => {
-                console.log(device.productName);      // "Arduino Micro"
-                console.log(device.manufacturerName); // "Arduino LLC"
-            })
-            .then(() => device.selectConfiguration(1)) // Select configuration .1 for the device.
-            .then(() => device.claimInterface(2)) // Request exclusive control over interface #2.
-            .then(() => device.controlTransferOut({
-                requestType: 'class',
-                recipient: 'interface',
-                request: 0x22,
-                value: 0x01,
-                index: 0x02})) // Ready to receive data
-        })
-        // Bind vote buttons
-        // Move the 3 lines into the function where are vote is casted via the color sensor
-        $('.button-vote').click(function(){
-            if (window.device) {
-                device.transferOut(4, new Uint8Array([parseInt($(this).attr('party'))]))
-            }
-        })
+        window.onload = async function () {
 
-        // Call this function to show Arduino feedback in the console for debugging
-        monitorUSBInput()
-    }
+            // Initialize WebUSB ------------------------
+            window.usbDevice = null
+            // Bind connect button
+            $('.TheJokerMachine').click(function(){
+                navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
+                .then(selectedDevice => {
+                    window.usbDevice = selectedDevice;
+                    return usbDevice.open(); // Begin a session.
+                })
+                .then(() => {
+                    console.log(usbDevice.productName);      // "Arduino Micro"
+                    console.log(usbDevice.manufacturerName); // "Arduino LLC"
+                })
+                .then(() => usbDevice.selectConfiguration(1)) // Select configuration .1 for the usbDevice.
+                .then(() => usbDevice.claimInterface(2)) // Request exclusive control over interface #2.
+                .then(() => usbDevice.controlTransferOut({
+                    requestType: 'class',
+                    recipient: 'interface',
+                    request: 0x22,
+                    value: 0x01,
+                    index: 0x02})) // Ready to receive data
+            })
+            // Bind vote buttons
+            // Move the 3 lines into the function where are vote is casted via the color sensor
+            $('.card').click(function(){
+                if (window.usbDevice) {
+                    usbDevice.transferOut(4, new Uint8Array([parseInt($(this).attr('party'))]))
+                }
+            })
 
-    // Keep it for debugging
-    // Monitor incoming USB port data from Arduino
-    async function monitorUSBInput () {
-        while (true) {
-            if (window.device) {
-                let input = await device.transferIn(5, 64)
-                let message = new TextDecoder().decode(input.data)
-                console.log('Received:', message)
-            } else {
-                await wait(1)
-            }
-        }
-    }
-    function wait (seconds) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve()
-            }, seconds * 1000)
-        })
-    
+            // Call this function to show Arduino feedback in the console for debugging
+            monitorUSBInput()
+
+            // Initialize Web Bluetooth ------------------------
             new Bluetooth() // Bluetooth must initialize for once
             color = new TFunctionModuleColor()
             color.onColorChange = function (c) {
@@ -260,19 +241,6 @@
                 else {
                     delete window.currentVote
                 }
-
-            }
-
-            // party: string - The name of the party, e.g. "monarchy", "democracy", etc.
-            function checkColor (c, party) {
-                let dr = Math.abs(c.r - COLORS[party].r)
-                let dg = Math.abs(c.g - COLORS[party].g)
-                let db = Math.abs(c.b - COLORS[party].b)
-                let dTotal = dr + dg + db
-                if(dTotal < TOLERENCE) {
-                    if (window.currentVote != party) vote(party)
-                    window.currentVote = party
-                } 
             }
             $(".votehere").click(connectSensor)
             async function connectSensor () {
@@ -290,36 +258,70 @@
                 console.log("ended");
                 shutUp()
             });
-            function onClickPortrait () {
-                let portrait = $(this)
-                let party = portrait.attr("party")
-                console.log("You have voted for "+ party, this)
-                shutUp()
-                speak(party)
-                vote(party)
+        }
+
+        // Keep it for debugging
+        // Monitor incoming USB port data from Arduino
+        async function monitorUSBInput () {
+            while (true) {
+                if (window.usbDevice) {
+                    let input = await usbDevice.transferIn(5, 64)
+                    let message = new TextDecoder().decode(input.data)
+                    console.log('Received:', message)
+                } else {
+                    await wait(1)
+                }
             }
         }
-        function vote(party){
-            votes[party]++
-            console.log(votes)
-            let totalVotes = votes.communism + votes.monarchy + votes.fascism + votes.republic
-            $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
-            $(".graph-fascism").html(votes.fascism).css("width", votes.fascism/totalVotes *100 + "%")
-            $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
-            $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
+        function wait (seconds) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve()
+                }, seconds * 1000)
+            })
         }
-        function speak(party) {
-            let portrait = $(".portrait-" + party)
-            window.currentParty = party
-            portrait.css("background-image","url(images/"+ party + ".gif)")
-            audioElement.src="sounds/"+ party +".mp3"
-            audioElement.play();
+
+        // party: string - The name of the party, e.g. "monarchy", "democracy", etc.
+        function checkColor (c, party) {
+            let dr = Math.abs(c.r - COLORS[party].r)
+            let dg = Math.abs(c.g - COLORS[party].g)
+            let db = Math.abs(c.b - COLORS[party].b)
+            let dTotal = dr + dg + db
+            if(dTotal < TOLERENCE) {
+                if (window.currentVote != party) vote(party)
+                window.currentVote = party
+            } 
         }
-        function shutUp() {
-            if (!window.currentParty) return
-            let portrait = $(".portrait-" + currentParty)
-            portrait.css("background-image","url(images/"+ currentParty + ".png)")
-        }
+
+    function onClickPortrait () {
+        let portrait = $(this)
+        let party = portrait.attr("party")
+        console.log("You have voted for "+ party, this)
+        shutUp()
+        speak(party)
+        vote(party)
+    }
+    function vote(party){
+        votes[party]++
+        console.log(votes)
+        let totalVotes = votes.communism + votes.monarchy + votes.fascism + votes.republic
+        $(".graph-monarchy").html(votes.monarchy).css("width", votes.monarchy/totalVotes *100 + "%")
+        $(".graph-fascism").html(votes.fascism).css("width", votes.fascism/totalVotes *100 + "%")
+        $(".graph-communism").html(votes.communism).css("width", votes.communism/totalVotes *100 + "%")
+        $(".graph-republic").html(votes.republic).css("width", votes.republic/totalVotes *100 + "%")
+    }
+    function speak(party) {
+        let portrait = $(".portrait-" + party)
+        window.currentParty = party
+        portrait.css("background-image","url(images/"+ party + ".gif)")
+        audioElement.src="sounds/"+ party +".mp3"
+        audioElement.play();
+    }
+    function shutUp() {
+        if (!window.currentParty) return
+        let portrait = $(".portrait-" + currentParty)
+        portrait.css("background-image","url(images/"+ currentParty + ".png)")
+    }
 
     </script>
 </header>
@@ -327,27 +329,27 @@
     <div class="TheJokerMachine">
         The Polling Machine
     </div>
-    <div class="card card-monarchy" >
+    <div class="card card-monarchy" party="0">
         <div class="party">Monarchy</div> 
         <div class="name">Queen Victoria</div> 
         <div class="portrait portrait-monarchy" party="monarchy"> 
         </div> 
         <div class="icon icon-monarchy"></div> 
     </div>
-    <div class="card card-fascism" >
+    <div class="card card-fascism" party="1">
         <div class="party">Communism</div> 
         <div class="name">Kai</div> 
         <div class="portrait portrait-fascism"party="fascism">
         </div> 
         <div class="icon icon-fascism"></div> 
     </div>
-    <div class="card card-communism" >
+    <div class="card card-communism" party="2">
         <div class="party">Fascism</div> 
         <div class="name">Admiral Erich Raeder</div> 
         <div class="portrait portrait-communism" party="communism"></div> 
         <div class="icon icon-communism"></div> 
     </div>
-    <div class="card card-republic" >
+    <div class="card card-republic" party="3">
         <div class="party">Republic</div> 
         <div class="name">Jomo Kenyatta</div> 
         <div class="portrait portrait-republic"party="republic"></div> 
