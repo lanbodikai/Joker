@@ -96,15 +96,15 @@
             background-size:cover;
         }
         .portrait-fascism{
-            background-image: url(images/communism.png);
-            background-position:left;
-            background-repeat: no-repeat;
-            background-size:cover;
-        }
-        .portrait-communism{
             background-image: url(images/fascism.png);
             background-position:left;
             background-repeat:no-repeat;
+            background-size:cover;
+        }
+        .portrait-communism{
+            background-image: url(images/communism.png);
+            background-position:left;
+            background-repeat: no-repeat;
             background-size:cover;
         }
         .portrait-republic{
@@ -193,7 +193,60 @@
 
         // window.onload is the initialization function triggered when the whole html body is loaded
         window.onload = function () {
+            window.device = null
+        // Bind connect button
+        // Replace $('.button-connect') with a secret <div> on your page
+        $('.button-connect').click(function(){
+            navigator.usb.requestDevice({ filters: [{ vendorId: 0x2341 }] })
+            .then(selectedDevice => {
+                window.device = selectedDevice;
+                return device.open(); // Begin a session.
+            })
+            .then(() => {
+                console.log(device.productName);      // "Arduino Micro"
+                console.log(device.manufacturerName); // "Arduino LLC"
+            })
+            .then(() => device.selectConfiguration(1)) // Select configuration .1 for the device.
+            .then(() => device.claimInterface(2)) // Request exclusive control over interface #2.
+            .then(() => device.controlTransferOut({
+                requestType: 'class',
+                recipient: 'interface',
+                request: 0x22,
+                value: 0x01,
+                index: 0x02})) // Ready to receive data
+        })
+        // Bind vote buttons
+        // Move the 3 lines into the function where are vote is casted via the color sensor
+        $('.button-vote').click(function(){
+            if (window.device) {
+                device.transferOut(4, new Uint8Array([parseInt($(this).attr('party'))]))
+            }
+        })
 
+        // Call this function to show Arduino feedback in the console for debugging
+        monitorUSBInput()
+    }
+
+    // Keep it for debugging
+    // Monitor incoming USB port data from Arduino
+    async function monitorUSBInput () {
+        while (true) {
+            if (window.device) {
+                let input = await device.transferIn(5, 64)
+                let message = new TextDecoder().decode(input.data)
+                console.log('Received:', message)
+            } else {
+                await wait(1)
+            }
+        }
+    }
+    function wait (seconds) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve()
+            }, seconds * 1000)
+        })
+    
             new Bluetooth() // Bluetooth must initialize for once
             color = new TFunctionModuleColor()
             color.onColorChange = function (c) {
@@ -282,14 +335,14 @@
         <div class="icon icon-monarchy"></div> 
     </div>
     <div class="card card-fascism" >
-        <div class="party">Communim</div> 
+        <div class="party">Communism</div> 
         <div class="name">Kai</div> 
         <div class="portrait portrait-fascism"party="fascism">
         </div> 
         <div class="icon icon-fascism"></div> 
     </div>
     <div class="card card-communism" >
-        <div class="party">Communism</div> 
+        <div class="party">Fascism</div> 
         <div class="name">Admiral Erich Raeder</div> 
         <div class="portrait portrait-communism" party="communism"></div> 
         <div class="icon icon-communism"></div> 
