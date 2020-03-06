@@ -1,4 +1,3 @@
-// Third-party WebUSB Arduino library
 #include <WebUSB.h>
 #include <Adafruit_NeoPixel.h>
 
@@ -10,6 +9,7 @@ WebUSB WebUSBSerial(1 /* https:// */, "webusb.github.io/arduino/demos");
 #endif
 #define LED_PIN    6
 #define LED_COUNT 150
+#define FADESPEED 5
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 
@@ -39,25 +39,25 @@ void loop() {
     Serial.print(command);
     Serial.print(" -> ");
     switch (command) {
-      case 0: // The command code you defined
+      case 2: // The command code you defined
         // Write you codes to light uo teh LED strip
         colorWipe(strip.Color(255,0,0), 50); // Red
         Serial.println("Fascism");
         Serial.flush();
         break;
-      case 1: // The command code you defined
+      case 3: // The command code you defined
         // Write you codes to light uo teh LED strip
         colorWipe(strip.Color(0,255,0), 50); // Green
         Serial.println("Republic");
         Serial.flush();
         break;
-      case 2: // The command code you defined
+      case 0: // The command code you defined
         // Write you codes to light uo teh LED strip
         colorWipe(strip.Color(200, 5, 255), 50); // Purple
         Serial.println("Monarchy");
         Serial.flush();
         break;
-      case 3: // The command code you defined
+      case 1: // The command code you defined
         // Write you codes to light uo teh LED strip
         colorWipe(strip.Color( 255, 255, 0), 50); // Yello
         Serial.println("Monarchy");
@@ -70,22 +70,15 @@ void loop() {
   }
 }
 void colorWipe(uint32_t color, int wait) {
-  for(int i=0; i<strip.numPixels(); i++) { // For each pixel in strip...
+  for(int i=0; i<strip.numPixels(); i++) {
     strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
     strip.show();                          //  Update strip to match
-    delay(wait);                           //  Pause for a moment
-  }
-}
-void theaterChase(uint32_t color, int wait) {
-  for(int a=0; a<10; a++) {  // Repeat 10 times...
-    for(int b=0; b<3; b++) { //  'b' counts from 0 to 2...
-      strip.clear();         //   Set all pixels in RAM to 0 (off)
-      // 'c' counts up from 'b' to end of strip in steps of 3...
-      for(int c=b; c<strip.numPixels(); c += 3) {
-        strip.setPixelColor(c, color); // Set pixel 'c' to value 'color'
-      }
-      strip.show(); // Update strip with new contents
-    delay(wait);  // Pause for a moment
+    strip.setPixelColor(i+1, color);         //  Set pixel's color (in RAM)
+    strip.show();                          //  Update strip to match
+    strip.setPixelColor(i+2, color);         //  Set pixel's color (in RAM)
+    strip.show();                          //  Update strip to match
+    delay(50);
+    strip.clear();
     }
-  }
+    strip.clear();
 }
