@@ -185,9 +185,9 @@
                 b:17
             }
             ,republic: {
-                r:64,
-                g:228,
-                b:108
+                r:19,//64,
+                g:145,//228,
+                b:93//108
             }
         }
 
@@ -231,7 +231,7 @@
             new Bluetooth() // Bluetooth must initialize for once
             color = new TFunctionModuleColor()
             color.onColorChange = function (c) {
-                console.log(c) 
+                // console.log(c)
                 if (c) {
                     checkColor(c,"monarchy")
                     checkColor(c,"fascism")
@@ -287,6 +287,7 @@
             let dg = Math.abs(c.g - COLORS[party].g)
             let db = Math.abs(c.b - COLORS[party].b)
             let dTotal = dr + dg + db
+            console.log(`${party} R=${c.r} G=${c.g} B=${c.b} Delta=${dTotal}`)
             if(dTotal < TOLERENCE) {
                 if (window.currentVote != party) vote(party)
                 window.currentVote = party
